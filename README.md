@@ -4,4 +4,4 @@ WackyShell is a custom C# console shell with basic commands, fun effects, and si
 
 ## Features
 
-Built-in commands: echo, cd, pwd, ls, mkdir, rm, clear, exit
+Built-in commands: echo, cd, pwd, ls, mkdir, rm, clear, exit, wacky
