@@ -1,6 +1,6 @@
 # WackyShell
 
-WackyShell is a custom C# console shell with basic commands, fun effects, and simple file management.
+WackyShell is a custom C# console shell
 
 ## Features
 
