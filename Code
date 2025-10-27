@@ -1,0 +1,180 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace WackyShell
+{
+    internal class Program
+    {
+        private static HashSet<string> _types = ["echo", "exit", "type", "cd", "pwd", "rm", "rmdir", "clear", "mkdir", "wacky"];
+        static bool stopCommand = false;
+        static int Main()
+        {
+
+            Console.CancelKeyPress += (sender, e) =>
+            {
+                e.Cancel = true; 
+                Console.WriteLine("\nOperation canceled.");
+                stopCommand = true;
+            };
+
+            Console.WriteLine("WackyShell Assembly Copyright ©  2025");
+            while (true)
+            {
+                Console.Write(Directory.GetCurrentDirectory() + " $ ");
+                String input = Console.ReadLine()?.Trim();
+
+                if (input == "exit")
+                {
+                    return 0;
+                }
+                else if (input.StartsWith("type"))
+                {
+                    string type = StringBuilderStrings([.. input.Skip(4)]).Trim();
+                    string message = _types.Contains(type) ? $"{type} is a shell builtin"
+                                                           : $"{type}: not found";
+                    Console.WriteLine(message);
+                }
+                else if (input.Contains("echo"))
+                {
+
+                    Console.WriteLine(input.Replace("echo ", ""));
+                }
+                else if (input.Contains("cd"))
+                {
+                    string path = input.Replace("cd ", "").Trim();
+
+                    try
+                    {
+                        Directory.SetCurrentDirectory(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Error: {e.Message}");
+                    }
+                }
+                else if (input == "pwd")
+                {
+                    Console.WriteLine(Directory.GetCurrentDirectory());
+                }
+                else if (input == "ls")
+                {
+                    foreach (var d in Directory.GetDirectories(".")) Console.WriteLine(d);
+                    foreach (var f in Directory.GetFiles(".")) Console.WriteLine(f);
+                }
+                else if (input == "clear")
+                {
+                    Console.Clear();
+                }
+                else if (input.Contains("mkdir"))
+                {
+                    string dirName = input.Replace("mkdir ", "").Trim();
+
+                    try
+                    {
+                        Directory.CreateDirectory(dirName);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Error: {e.Message}");
+                    }
+                }
+                else if (input.StartsWith("rm "))
+                {
+                    string target = input.Substring(3).Trim();
+
+                    if (File.Exists(target))
+                    {
+                        File.Delete(target);
+                        Console.WriteLine(target + "was deleted succesfully!");
+                    }
+                    else if (Directory.Exists(target))
+                    {
+                        foreach (var file in Directory.GetFiles(target, "*", SearchOption.AllDirectories))
+                            File.SetAttributes(file, FileAttributes.Normal);
+
+                        Directory.Delete(target, true);
+                        Console.WriteLine(target + " was deleted succesfully!");
+                    }
+                    else if (target == "*")
+                    {
+                        foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()))
+                        {
+                            File.SetAttributes(file, FileAttributes.Normal);
+                            File.Delete(file);
+                            Console.WriteLine("Deleted all files and directories succesfully!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("File or directory not found.");
+                    }
+                }
+                else if (input == "wacky")
+                {
+                    StartWackyEffect();
+                }
+                else
+                {
+                    Console.WriteLine($"\n{input}: command not found");
+                }
+
+
+
+            }
+        }
+
+        static string StringBuilderStrings(IEnumerable<char> charSequence)
+        {
+            StringBuilder sb = new();
+            foreach (char c in charSequence)
+            {
+                sb.Append(c);
+            }
+
+            return sb.ToString();
+        }
+
+        static void StartWackyEffect()
+        {
+            string word = "wacky";
+            int colorIndex = 0;
+            ConsoleColor[] colors = new ConsoleColor[]
+            {
+        ConsoleColor.Red, ConsoleColor.Green, ConsoleColor.Yellow,
+        ConsoleColor.Blue, ConsoleColor.Magenta, ConsoleColor.Cyan
+            };
+
+            int letterIndex = 0;
+            int colorChangeInterval = 5; 
+            int printCounter = 0;
+
+            while (!stopCommand)
+            {
+                char[] chars = word.ToCharArray();
+                for (int i = 0; i < chars.Length; i++)
+                chars[i] = char.ToLower(chars[i]);
+                chars[letterIndex] = char.ToUpper(chars[letterIndex]);
+
+                Console.ForegroundColor = colors[colorIndex];
+                Console.Write("\n" + new string(chars)); 
+
+                letterIndex = (letterIndex + 1) % word.Length;
+
+                printCounter++;
+                if (printCounter >= colorChangeInterval)
+                {
+                    colorIndex = (colorIndex + 1) % colors.Length;
+                    printCounter = 0; 
+                }
+
+                Thread.Sleep(10); 
+            }
+
+            Console.ResetColor();
+        }
+
+    }
+}
