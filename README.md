@@ -18,3 +18,8 @@ rm: Removes the specified directory or file <br />
 clear: clears the command-line <br />
 exit: quits the application <br /> 
 type: used to check if a command is built-in. Example: type echo <br />
+
+
+## Contributing
+
+We welcome contributions! Add commands, fix bugs, or suggest improvements. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
